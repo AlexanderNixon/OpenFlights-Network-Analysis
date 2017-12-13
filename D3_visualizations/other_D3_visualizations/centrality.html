@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>D3 World Map</title>
+    <style>
+
+    body,svg{
+      width: 100%;
+      height: 100%
+    }
+    svg {
+      margin: 0;
+      display: inherit;
+
+    }
+
+      path {
+        stroke: white;
+        stroke-width: 2px;
+        fill: lightgrey;
+
+
+      }
+
+
+
+    </style>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+    var bubbles = [ [4.7638897895799985, 52.308601379399995, 10.0, "red"],[8.5705556000000005, 50.033333299999995, 10.0, "red"],[2.5499999523199999, 49.012798309300003, 9.6210526315789497, "red"],[28.814599990799998, 40.976898193400004, 9.2421052631578942, "red"],[-84.4281005859375, 33.636699676513672, 8.8631578947368439, "red"],[116.58499908447266, 40.080101013183601, 7.0631578947368432, "red"],[-87.904800420000001, 41.978599549999998, 6.1157894736842113, "red"],[11.786100387572999, 48.353801727295, 6.0210526315789474, "red"],[37.906299591064453, 55.408798217773438, 4.6947368421052644, "red"],[-97.038002014160156, 32.896800994873054, 4.5052631578947366, "red"],[55.364398956300001, 25.252799987800003, 4.3157894736842124, "red"],[-0.46194099999999999, 51.470599999999997, 4.3157894736842124, "red"],[-104.672996521, 39.861698150635, 2.8000000000000016, "red"],[-95.341400146484375, 29.98439979553223, 2.6105263157894738, "red"],[-0.19027799367904666, 51.148101806640632, 2.5157894736842126, "red"],[2.0784599781035999, 41.297100067138999, 2.1368421052631597, "red"],[12.238888900000001, 41.800277799999996, 1.9473684210526319, "red"],[-73.778900149999998, 40.639801030000001, 1.8526315789473702, "red"],[-3.56264, 40.471926000000003, 1.8526315789473702, "red"],[-74.168701171875, 40.692501068115227, 1.5684210526315807, "red"]
+
+
+    ]
+
+
+    var bubbles1 = [ [4.7638897895799985, 52.308601379399995, 10.0],[8.5705556000000005, 50.033333299999995, 10.0],[2.5499999523199999, 49.012798309300003, 9.7763975155279521],[28.814599990799998, 40.976898193400004, 9.5527950310559007],[11.786100387572999, 48.353801727295, 9.329192546583851],[55.364398956300001, 25.252799987800003, 6.8695652173913064],[-0.46194099999999999, 51.470599999999997, 6.6459627329192559],[-0.19027799367904666, 51.148101806640632, 5.7515527950310572],[2.0784599781035999, 41.297100067138999, 5.3602484472049694],[12.238888900000001, 41.800277799999996, 5.2484472049689446],[-73.778900149999998, 40.639801030000001, 5.1925465838509322],[-3.56264, 40.471926000000003, 5.1925465838509322],[4.4844398498500002, 50.901401519799997, 5.0248447204968958],[-2.2749500274658203, 53.35369873046875, 4.6894409937888195],[6.766779899597168, 51.289501190185547, 4.4099378881987583],[-6.2700700759887695, 53.421298980712891, 4.354037267080745],[37.4146, 55.972599000000002, 4.1863354037267086],[16.569700241089002, 48.110298156738004, 4.1863354037267086],[8.5491695404053001, 47.464698791503999, 3.9068322981366466],[17.918600082396999, 59.651901245116996, 3.7950310559006213],[12.656000137328999, 55.617900848388999, 3.0683229813664594],[-4.499110221862793, 36.674900054931641, 2.9565217391304355],[8.7281100000000009, 45.630600000000001, 2.6770186335403725],[30.26250076293945, 59.800300598144531, 2.4534161490683237],[13.287699699400001, 52.559700012200004, 2.4534161490683237],[11.100399971008001, 60.193901062011996, 2.2857142857142851],[23.944499969499997, 37.936401367199998, 2.0062111801242235],[-9.1359195709200005, 38.781299591100002, 1.9503105590062115],[6.108950138092041, 46.23809814453125, 1.8944099378881987],[14.26, 50.1008, 1.7826086956521738],[7.2158699035600007, 43.658401489300005, 1.3913043478260871],[24.963300704956001, 60.317199707031001, 1.1677018633540373],[9.9882297515869016, 53.630401611328004, 1.1118012422360251]
+  ]
+
+      var bubbles2 = [  [-84.4281005859375, 33.636699676513672, 10.0],[-87.904800420000001, 41.978599549999998, 10.0],[-97.038002014160156, 32.896800994873054, 9.272058823529413],[-104.672996521, 39.861698150635, 8.0808823529411775],[-95.341400146484375, 29.98439979553223, 6.8897058823529411],[-74.168701171875, 40.692501068115227, 6.8235294117647065],[-118.40799709999999, 33.942501069999999, 5.7647058823529402],[-79.630599975599992, 43.677200317400001, 5.5000000000000009],[-80.943099975585938, 35.214000701904297, 5.367647058823529],[-80.290603637695312, 25.79319953918457, 4.9705882352941178],[-83.353401184082031, 42.212398529052734, 4.7720588235294121],[-115.15200039999999, 36.08010101, 4.5735294117647065],[-93.221801757800009, 44.881999969500001, 4.4411764705882346],[-77.455802919999996, 38.944499970000003, 4.3088235294117645],[-75.241096496582031, 39.871898651123047, 4.0441176470588234],[-122.375, 37.618999481201172, 3.7794117647058831],[-71.005203249999994, 42.364299770000002, 2.5882352941176467],[-81.308998107910156, 28.429399490356445, 2.4558823529411762],[-80.152702331542969, 26.072599411010746, 2.3897058823529411],[-122.30899810791016, 47.449001312255859, 2.0588235294117645],[-111.97799682617188, 40.788398742675781, 1.8602941176470589],[-112.01200103759766, 33.434299468994141, 1.7279411764705881],[-77.037696999999994, 38.8521, 1.661764705882353],[-86.877098083500002, 21.036500930800003, 1.661764705882353]
+  ]
+
+ 
+
+
+
+
+
+      var width = 1000;
+      var height = 510;
+      var height2 = 370
+
+      var projection = d3.geo.mercator().scale(162);
+
+      var svg = d3.select("body").append("svg")
+          .attr("viewBox", "0 0 " + width + " " + height2)
+          .attr("width", width)
+          .attr("height", height)
+
+      var svg2 = d3.select("body").append("svg")
+          .attr("viewBox", "0 0 " + width + " " + height2)
+          .attr("width", width)
+          .attr("height", height)
+
+
+
+      var path = d3.geo.path()
+          .projection(projection);
+
+
+      var g = svg.append("g");
+      var g2 = svg2.append("g");
+
+
+
+      d3.json("world.json", function(error, topology) {
+          g.selectAll("path")
+            .data(topojson.object(topology, topology.objects.countries)
+                .geometries)
+            .enter().append("path")
+            .attr("d", path)
+            .on("click",clicked);
+
+          svg.append("g")
+          svg.selectAll("circle")
+            .data(bubbles).enter()
+            .append("circle")
+            .attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+            .attr("cy", function (d) { return projection(d)[1]; })
+            .attr("r", function (d) { return d[2]; })
+
+            .style('fill-opacity', 0.5)
+            .style('stroke', function(d) { return d[3]; })
+            .style('fill', function(d) { return d[3]; })
+            .style('stroke-width', 0.3)
+
+
+});
+
+
+
+      	// This function takes an object, the key names where it will find an array of lng/lat pairs, e.g. `[-74, 40]`
+      	// And a bend parameter for how much bend you want in your arcs, the higher the number, the less bend.
+      	function lngLatToArc(d, sourceName, targetName, bend){
+      		// If no bend is supplied, then do the plain square root
+      		bend = bend || 1 ;
+      		// `d[sourceName]` and `d[targetname]` are arrays of `[lng, lat]`
+      		// Note, people often put these in lat then lng, but mathematically we want x then y which is `lng,lat`
+
+      		var sourceLngLat = d[sourceName],
+      				targetLngLat = d[targetName];
+
+      		if (targetLngLat && sourceLngLat) {
+      			var sourceXY = projection( sourceLngLat ),
+      					targetXY = projection( targetLngLat );
+
+      			// Uncomment this for testing, useful to see if you have any null lng/lat values
+      			// if (!targetXY) console.log(d, targetLngLat, targetXY)
+      			var sourceX = sourceXY[0],
+      					sourceY = sourceXY[1];
+
+      			var targetX = targetXY[0],
+      					targetY = targetXY[1];
+
+      			var dx = targetX - sourceX,
+      					dy = targetY - sourceY,
+      					dr = Math.sqrt(dx * dx + dy * dy)*bend;
+
+      			// To avoid a whirlpool effect, make the bend direction consistent regardless of whether the source is east or west of the target
+      			var west_of_source = (targetX - sourceX) < 0;
+      			if (west_of_source) return "M" + targetX + "," + targetY + "A" + dr + "," + dr + " 0 0,1 " + sourceX + "," + sourceY;
+      			return "M" + sourceX + "," + sourceY + "A" + dr + "," + dr + " 0 0,1 " + targetX + "," + targetY;
+
+      		} else {
+      			return "M0,0,l0,0z";
+      		}
+      	}
+
+      	// Zoom to feature on click
+      	// This is optional but if you use mapstarter.com, you get it for free.
+      	function clicked(d,i) {
+
+      		//Add any other onClick events here
+      		var x, y, k;
+
+      		if (d && centered !== d) {
+      	    // Compute the new map center and scale to zoom to
+      			var centroid = path.centroid(d);
+      			var b = path.bounds(d);
+      			x = centroid[0];
+      			y = centroid[1];
+      			k = .8 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+      			centered = d
+      		} else {
+      			x = width / 2;
+      			y = height / 2;
+      			k = 1;
+      			centered = null;
+      		}
+
+      		// Highlight the new feature
+      		g.selectAll("path")
+      			.classed("highlighted",function(d) {
+      					return d === centered;
+      			})
+      			.style("stroke-width", 1 / k + "px"); // Keep the border width constant
+
+      		//Zoom and re-center the whole map container
+      		//Comment `.transition()` and `.duration()` to eliminate gradual zoom
+      		svg
+      			.transition()
+      			.duration(500)
+      			.attr("transform","translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
+      	}
+
+
+
+    </script>
+  </body>
+</html>

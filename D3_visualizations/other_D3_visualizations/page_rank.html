@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>D3 World Map</title>
+    <style>
+
+    body,svg{
+      width: 100%;
+      height: 100%
+    }
+    svg {
+      margin: 0;
+      display: inherit;
+
+    }
+
+      path {
+        stroke: white;
+        stroke-width: 2px;
+        fill: lightgrey;
+
+
+      }
+
+
+
+    </style>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+    var bubbles = [ [4.7638897895799985, 52.308601379399995, 10.0, "blue"],[8.5705556000000005, 50.033333299999995, 10.0, "blue"],[2.5499999523199999, 49.012798309300003, 9.643564356435645, "blue"],[28.814599990799998, 40.976898193400004, 9.2871287128712865, "blue"],[-87.904800420000001, 41.978599549999998, 8.9306930693069315, "blue"],[55.364398956300001, 25.252799987800003, 6.2574257425742585, "blue"],[-0.46194099999999999, 51.470599999999997, 4.653465346534654, "blue"],[-73.778900149999998, 40.639801030000001, 3.2277227722772288, "blue"],[-118.40799709999999, 33.942501069999999, 2.3366336633663378, "blue"],[-79.630599975599992, 43.677200317400001, 1.1782178217821795, "blue"]
+
+    ]
+
+ 
+
+
+
+
+
+      var width = 1000;
+      var height = 510;
+      var height2 = 370
+
+      var projection = d3.geo.mercator().scale(162);
+
+      var svg = d3.select("body").append("svg")
+          .attr("viewBox", "0 0 " + width + " " + height2)
+          .attr("width", width)
+          .attr("height", height)
+
+      var svg2 = d3.select("body").append("svg")
+          .attr("viewBox", "0 0 " + width + " " + height2)
+          .attr("width", width)
+          .attr("height", height)
+
+
+
+      var path = d3.geo.path()
+          .projection(projection);
+
+
+      var g = svg.append("g");
+      var g2 = svg2.append("g");
+
+
+
+      d3.json("world.json", function(error, topology) {
+          g.selectAll("path")
+            .data(topojson.object(topology, topology.objects.countries)
+                .geometries)
+            .enter().append("path")
+            .attr("d", path)
+            .on("click",clicked);
+
+          svg.append("g")
+          svg.selectAll("circle")
+            .data(bubbles).enter()
+            .append("circle")
+            .attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+            .attr("cy", function (d) { return projection(d)[1]; })
+            .attr("r", function (d) { return d[2]; })
+
+            .style('fill-opacity', 0.5)
+            .style('stroke', function(d) { return d[3]; })
+            .style('fill', function(d) { return d[3]; })
+            .style('stroke-width', 0.3)
+
+
+});
+
+
+
+      	// This function takes an object, the key names where it will find an array of lng/lat pairs, e.g. `[-74, 40]`
+      	// And a bend parameter for how much bend you want in your arcs, the higher the number, the less bend.
+      	function lngLatToArc(d, sourceName, targetName, bend){
+      		// If no bend is supplied, then do the plain square root
+      		bend = bend || 1 ;
+      		// `d[sourceName]` and `d[targetname]` are arrays of `[lng, lat]`
+      		// Note, people often put these in lat then lng, but mathematically we want x then y which is `lng,lat`
+
+      		var sourceLngLat = d[sourceName],
+      				targetLngLat = d[targetName];
+
+      		if (targetLngLat && sourceLngLat) {
+      			var sourceXY = projection( sourceLngLat ),
+      					targetXY = projection( targetLngLat );
+
+      			// Uncomment this for testing, useful to see if you have any null lng/lat values
+      			// if (!targetXY) console.log(d, targetLngLat, targetXY)
+      			var sourceX = sourceXY[0],
+      					sourceY = sourceXY[1];
+
+      			var targetX = targetXY[0],
+      					targetY = targetXY[1];
+
+      			var dx = targetX - sourceX,
+      					dy = targetY - sourceY,
+      					dr = Math.sqrt(dx * dx + dy * dy)*bend;
+
+      			// To avoid a whirlpool effect, make the bend direction consistent regardless of whether the source is east or west of the target
+      			var west_of_source = (targetX - sourceX) < 0;
+      			if (west_of_source) return "M" + targetX + "," + targetY + "A" + dr + "," + dr + " 0 0,1 " + sourceX + "," + sourceY;
+      			return "M" + sourceX + "," + sourceY + "A" + dr + "," + dr + " 0 0,1 " + targetX + "," + targetY;
+
+      		} else {
+      			return "M0,0,l0,0z";
+      		}
+      	}
+
+      	// Zoom to feature on click
+      	// This is optional but if you use mapstarter.com, you get it for free.
+      	function clicked(d,i) {
+
+      		//Add any other onClick events here
+      		var x, y, k;
+
+      		if (d && centered !== d) {
+      	    // Compute the new map center and scale to zoom to
+      			var centroid = path.centroid(d);
+      			var b = path.bounds(d);
+      			x = centroid[0];
+      			y = centroid[1];
+      			k = .8 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+      			centered = d
+      		} else {
+      			x = width / 2;
+      			y = height / 2;
+      			k = 1;
+      			centered = null;
+      		}
+
+      		// Highlight the new feature
+      		g.selectAll("path")
+      			.classed("highlighted",function(d) {
+      					return d === centered;
+      			})
+      			.style("stroke-width", 1 / k + "px"); // Keep the border width constant
+
+      		//Zoom and re-center the whole map container
+      		//Comment `.transition()` and `.duration()` to eliminate gradual zoom
+      		svg
+      			.transition()
+      			.duration(500)
+      			.attr("transform","translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
+      	}
+
+
+
+    </script>
+  </body>
+</html>
